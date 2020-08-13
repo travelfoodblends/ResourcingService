@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,7 @@ import com.resourcing.service.repository.RoleRepository;
  */
 @RestController
 @RequestMapping("/resourcingService")
+@CrossOrigin
 public class ResourcingServiceController {
 
 	/** The role repository. */
@@ -30,24 +32,24 @@ public class ResourcingServiceController {
 	private RoleRepository roleRepository;
 
 	/**
-	 * Gets the all employees.
+	 * Gets the all role.
 	 *
-	 * @return the all employees
+	 * @return the all role
 	 */
 	@GetMapping("/role")
-	public List<Role> getAllEmployees() {
+	public List<Role> getAllRoles() {
 		return roleRepository.findAll();
 	}
 
 	/**
-	 * Gets the employee by id.
+	 * Gets the role by id.
 	 *
 	 * @param roleId the role id
-	 * @return the employee by id
+	 * @return the role by id
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@GetMapping("/role/{id}")
-	public ResponseEntity<Role> getEmployeeById(@PathVariable(value = "id") Integer roleId)
+	public ResponseEntity<Role> getRoleById(@PathVariable(value = "id") Integer roleId)
 			throws ResourceNotFoundException {
 		Role role = roleRepository.findById(roleId)
 				.orElseThrow(() -> new ResourceNotFoundException("Role not found for this id :: " + roleId));
@@ -55,13 +57,13 @@ public class ResourcingServiceController {
 	}
 
 	/**
-	 * Creates the employee.
+	 * Creates the role.
 	 *
 	 * @param role the role
 	 * @return the role
 	 */
 	@PostMapping("/role")
-	public Role createEmployee(@Valid @RequestBody Role role) {
+	public Role createRole(@Valid @RequestBody Role role) {
 		return roleRepository.save(role);
 	}
 }

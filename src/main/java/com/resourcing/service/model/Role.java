@@ -2,6 +2,8 @@ package com.resourcing.service.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -9,15 +11,21 @@ import javax.persistence.Table;
 @Table(name = "role")
 public class Role {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+	
+	@Column(name = "name", nullable = false)
 	private String name;
-	private boolean enabled;
+	
+	@Column(name = "enabled")
+	private boolean enabled = true;
 	
 	
 	/**
 	 * @return the id
 	 */
-	@Id
+	
 	public int getId() {
 		return id;
 	}
@@ -30,7 +38,7 @@ public class Role {
 	/**
 	 * @return the name
 	 */
-	@Column(name = "name", nullable = false)
+	
 	public String getName() {
 		return name;
 	}
@@ -43,7 +51,7 @@ public class Role {
 	/**
 	 * @return the enabled
 	 */
-	@Column(name = "enabled")
+	
 	public boolean isEnabled() {
 		return enabled;
 	}
