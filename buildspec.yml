@@ -15,5 +15,6 @@ phases:
     commands:
       - echo Build completed on `date`
 artifacts:
+  type: zip
   files:
     - target/ResourcingService-0.0.1-SNAPSHOT.jar
