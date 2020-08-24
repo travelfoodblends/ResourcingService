@@ -122,7 +122,7 @@ public class ResourcingServiceController {
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@GetMapping("/account/{id}")
-	public ResponseEntity<Account> getAccountById(@PathVariable(value = "id") String accountId)
+	public ResponseEntity<Account> getAccountById(@PathVariable(value = "id") Integer accountId)
 			throws ResourceNotFoundException {
 		Account account = accountRepository.findById(accountId)
 				.orElseThrow(() -> new ResourceNotFoundException("Account not found for this id :: " + accountId));
