@@ -1,12 +1,17 @@
 package com.resourcing.service.controller;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.resourcing.service.exception.ResourceNotFoundException;
 import com.resourcing.service.model.Account;
 import com.resourcing.service.model.Role;
+import com.resourcing.service.model.SubUnit;
+import com.resourcing.service.model.VersionDetails;
 import com.resourcing.service.repository.AccountRepository;
 import com.resourcing.service.repository.RoleRepository;
+import com.resourcing.service.repository.SubUnitRepository;
 
 
 /**
@@ -37,6 +45,10 @@ public class ResourcingServiceController {
 	/** The account repository. */
 	@Autowired
 	private AccountRepository accountRepository;
+	
+	/** The sub unit repository. */
+	@Autowired
+	private SubUnitRepository subUnitRepository;
 
 	/**
 	 * Gets the all roles.
@@ -147,4 +159,110 @@ public class ResourcingServiceController {
 		return accountRepository.save(accountToFind);
 	}
 	
+	/**
+	 * Creates the sub unit.
+	 *
+	 * @param accountId the account id
+	 * @param subUnit the sub unit
+	 * @return the sub unit
+	 * @throws ResourceNotFoundException the resource not found exception
+	 */
+	@PostMapping("/account/{accountId}/subunit")
+    public SubUnit createSubUnit(@PathVariable(value = "accountId") Integer accountId,
+        @Valid @RequestBody SubUnit subUnit) throws ResourceNotFoundException {
+        return accountRepository.findById(accountId).map(account -> {
+        	subUnit.setAccount(account);
+        	return subUnitRepository.save(subUnit);
+        }).orElseThrow(() -> new ResourceNotFoundException("account not found"));
+        
+    }
+	
+	
+	 /**
+ 	 * Gets the sub units by account.
+ 	 *
+ 	 * @param accountId the account id
+ 	 * @return the sub units by account
+ 	 */
+ 	@GetMapping("/account/{accountId}/subunit")
+	public List <SubUnit> getSubUnitsByAccount(@PathVariable(value = "accountId") Integer accountId) {
+	        return subUnitRepository.findByAccountId(accountId);
+	}
+	 
+	 /**
+ 	 * Update sub unit.
+ 	 *
+ 	 * @param accountId the account id
+ 	 * @param subunitId the subunit id
+ 	 * @param subUnitRequest the sub unit request
+ 	 * @return the sub unit
+ 	 * @throws ResourceNotFoundException the resource not found exception
+ 	 */
+ 	@PutMapping("/account/{accountId}/subunit/{subunitId}")
+	public SubUnit updateSubUnit(@PathVariable(value = "accountId") Integer accountId,
+	        @PathVariable(value = "subunitId") Integer subunitId, @Valid @RequestBody SubUnit subUnitRequest)
+	    throws ResourceNotFoundException {
+	        if (!accountRepository.existsById(accountId)) {
+	            throw new ResourceNotFoundException("accountId not found");
+	        }
+
+	        return subUnitRepository.findById(subunitId).map(subUnit -> {
+	        	subUnit.setSubunitName(subUnitRequest.getSubunitName());
+	            return subUnitRepository.save(subUnit);
+	        }).orElseThrow(() -> new ResourceNotFoundException("subUnit id not found"));
+	 }
+	 
+ 	
+ 	/**
+	  * Gets the sub unit by account.
+	  *
+	  * @param accountId the account id
+	  * @param subunitId the subunit id
+	  * @return the sub unit by account
+	  * @throws ResourceNotFoundException the resource not found exception
+	  */
+	 @GetMapping("/account/{accountId}/subunit/{subunitId}")
+	public ResponseEntity<SubUnit> getSubUnitByAccount(@PathVariable(value = "accountId") Integer accountId,
+	        @PathVariable(value = "subunitId") Integer subunitId)
+	    throws ResourceNotFoundException {
+	        if (!accountRepository.existsById(accountId)) {
+	            throw new ResourceNotFoundException("accountId not found");
+	        }
+
+	        SubUnit subUnitVal = subUnitRepository.findById(subunitId)
+	        		.orElseThrow(() -> new ResourceNotFoundException("SubUnit not found for this id :: " + subunitId));
+			return ResponseEntity.ok().body(subUnitVal);
+	 }
+	 
+	  /**
+  	 * Delete sub unit.
+  	 *
+  	 * @param accountId the account id
+  	 * @param subunitId the subunit id
+  	 * @return the response entity
+  	 * @throws ResourceNotFoundException the resource not found exception
+  	 */
+  	@DeleteMapping("/account/{accountId}/subunit/{subunitId}")
+	public ResponseEntity <?> deleteSubUnit(@PathVariable(value = "accountId") Integer accountId,
+	        @PathVariable(value = "subunitId") Integer subunitId) throws ResourceNotFoundException {
+	        return subUnitRepository.findByIdAndAccountId(subunitId, accountId).map(subUnit -> {
+	        	subUnitRepository.delete(subUnit);
+	            return ResponseEntity.ok().build();
+	        }).orElseThrow(() -> new ResourceNotFoundException(
+	            "subunit not found with id " + subunitId + " and accountId " + accountId));
+	}
+  	
+  	/**
+	   * Gets the version details.
+	   *
+	   * @return the version details
+	   */
+	  @GetMapping("/version")
+  	public VersionDetails getVersionDetails(){
+  		VersionDetails details = new VersionDetails();
+  		details.setVersionNumber("20.08.01");
+  		details.setVersionDate("08/24/2020");
+  		
+  		return details;
+  	}
 }
