@@ -1,10 +1,6 @@
 package com.resourcing.service.controller;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -20,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.xray.spring.aop.XRayEnabled;
+import com.resourcing.service.dto.AccountDto;
+import com.resourcing.service.dto.RoleDto;
+import com.resourcing.service.dto.SubUnitDto;
 import com.resourcing.service.exception.ResourceNotFoundException;
 import com.resourcing.service.model.Account;
 import com.resourcing.service.model.Role;
@@ -36,6 +36,7 @@ import com.resourcing.service.repository.SubUnitRepository;
 @RestController
 @RequestMapping("/resourcingService")
 @CrossOrigin
+@XRayEnabled
 public class ResourcingServiceController {
 
 	/** The role repository. */
@@ -82,7 +83,10 @@ public class ResourcingServiceController {
 	 * @return the role
 	 */
 	@PostMapping("/role")
-	public Role createRole(@Valid @RequestBody Role role) {
+	public Role createRole(@Valid @RequestBody RoleDto roleDto) {
+		//avoid using @Entity object directly into @RequestMapping; vulnerable to malicious attack
+		Role role = new Role();
+		role.setName(roleDto.getName());
 		return roleRepository.save(role);
 	}
 	
@@ -94,13 +98,13 @@ public class ResourcingServiceController {
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@PutMapping("/role")
-	public Role updateRoleById(@Valid @RequestBody Role role)
+	public Role updateRoleById(@Valid @RequestBody RoleDto roleDto)
 			throws ResourceNotFoundException {
-		Role roleToFind = roleRepository.findById(role.getId())
-				.orElseThrow(() -> new ResourceNotFoundException("Role not found for this id :: " + role.getId()));
-		roleToFind.setEnabled(role.isEnabled());
+		Role roleToFind = roleRepository.findById(roleDto.getId())
+				.orElseThrow(() -> new ResourceNotFoundException("Role not found for this id :: " + roleDto.getId()));
+		roleToFind.setEnabled(roleDto.isEnabled());
 		
-		return roleRepository.save(role);
+		return roleRepository.save(roleToFind);
 	}
 	
 	/**
@@ -110,7 +114,9 @@ public class ResourcingServiceController {
 	 * @return the account
 	 */
 	@PostMapping("/account")
-	public Account createAccount(@Valid @RequestBody Account account) {
+	public Account createAccount(@Valid @RequestBody AccountDto accountDto) {
+		Account account = new Account();
+		account.setAccountName(accountDto.getAccountName());
 		return accountRepository.save(account);
 	}
 	
@@ -150,11 +156,11 @@ public class ResourcingServiceController {
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@PutMapping("/account")
-	public Account updateAccountById(@Valid @RequestBody Account account)
+	public Account updateAccountById(@Valid @RequestBody AccountDto accountDto)
 			throws ResourceNotFoundException {
-		Account accountToFind = accountRepository.findById(account.getId())
-				.orElseThrow(() -> new ResourceNotFoundException("Account not found for this id :: " + account.getId()));
-		accountToFind.setAccountName(account.getAccountName());
+		Account accountToFind = accountRepository.findById(accountDto.getId())
+				.orElseThrow(() -> new ResourceNotFoundException("Account not found for this id :: " + accountDto.getId()));
+		accountToFind.setAccountName(accountDto.getAccountName());
 		
 		return accountRepository.save(accountToFind);
 	}
@@ -169,7 +175,9 @@ public class ResourcingServiceController {
 	 */
 	@PostMapping("/account/{accountId}/subunit")
     public SubUnit createSubUnit(@PathVariable(value = "accountId") Integer accountId,
-        @Valid @RequestBody SubUnit subUnit) throws ResourceNotFoundException {
+        @Valid @RequestBody SubUnitDto subUnitDto) throws ResourceNotFoundException {
+		SubUnit subUnit = new SubUnit();
+		subUnit.setSubunitName(subUnitDto.getSubunitName());
         return accountRepository.findById(accountId).map(account -> {
         	subUnit.setAccount(account);
         	return subUnitRepository.save(subUnit);
@@ -200,8 +208,10 @@ public class ResourcingServiceController {
  	 */
  	@PutMapping("/account/{accountId}/subunit/{subunitId}")
 	public SubUnit updateSubUnit(@PathVariable(value = "accountId") Integer accountId,
-	        @PathVariable(value = "subunitId") Integer subunitId, @Valid @RequestBody SubUnit subUnitRequest)
+	        @PathVariable(value = "subunitId") Integer subunitId, @Valid @RequestBody SubUnitDto subUnitDto)
 	    throws ResourceNotFoundException {
+ 		SubUnit subUnitRequest = new SubUnit();
+ 		subUnitRequest.setId(subUnitDto.getId());
 	        if (!accountRepository.existsById(accountId)) {
 	            throw new ResourceNotFoundException("accountId not found");
 	        }
@@ -242,8 +252,9 @@ public class ResourcingServiceController {
   	 * @return the response entity
   	 * @throws ResourceNotFoundException the resource not found exception
   	 */
-  	@DeleteMapping("/account/{accountId}/subunit/{subunitId}")
-	public ResponseEntity <?> deleteSubUnit(@PathVariable(value = "accountId") Integer accountId,
+  	@SuppressWarnings("rawtypes")
+	@DeleteMapping("/account/{accountId}/subunit/{subunitId}")
+	public ResponseEntity deleteSubUnit(@PathVariable(value = "accountId") Integer accountId,
 	        @PathVariable(value = "subunitId") Integer subunitId) throws ResourceNotFoundException {
 	        return subUnitRepository.findByIdAndAccountId(subunitId, accountId).map(subUnit -> {
 	        	subUnitRepository.delete(subUnit);

@@ -1,6 +1,5 @@
 package com.resourcing.service.model;
 
-import java.util.Date;
 
 import org.springframework.stereotype.Component;
 

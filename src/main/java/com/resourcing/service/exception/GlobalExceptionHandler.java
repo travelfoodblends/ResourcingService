@@ -21,21 +21,23 @@ public class GlobalExceptionHandler {
 	 * @param request the request
 	 * @return the response entity
 	 */
+	@SuppressWarnings("rawtypes")
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+	public ResponseEntity resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 
 	/**
-	 * Globle excpetion handler.
+	 * Global exception handler.
 	 *
 	 * @param ex the ex
 	 * @param request the request
 	 * @return the response entity
 	 */
+	@SuppressWarnings("rawtypes")
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<?> globleExcpetionHandler(Exception ex, WebRequest request) {
+	public ResponseEntity globleExcpetionHandler(Exception ex, WebRequest request) {
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
