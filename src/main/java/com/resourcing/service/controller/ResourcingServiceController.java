@@ -103,7 +103,7 @@ public class ResourcingServiceController {
 		Role roleToFind = roleRepository.findById(roleDto.getId())
 				.orElseThrow(() -> new ResourceNotFoundException("Role not found for this id :: " + roleDto.getId()));
 		roleToFind.setEnabled(roleDto.isEnabled());
-		
+		roleToFind.setName(roleDto.getName());
 		return roleRepository.save(roleToFind);
 	}
 	
