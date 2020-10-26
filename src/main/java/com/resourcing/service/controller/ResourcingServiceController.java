@@ -26,6 +26,7 @@ import com.resourcing.service.model.Role;
 import com.resourcing.service.model.SubUnit;
 import com.resourcing.service.model.VersionDetails;
 import com.resourcing.service.repository.AccountRepository;
+import com.resourcing.service.repository.LocationRepository;
 import com.resourcing.service.repository.RoleRepository;
 import com.resourcing.service.repository.SubUnitRepository;
 
@@ -50,6 +51,7 @@ public class ResourcingServiceController {
 	/** The sub unit repository. */
 	@Autowired
 	private SubUnitRepository subUnitRepository;
+	
 
 	/**
 	 * Gets the all roles.

@@ -1,7 +1,9 @@
+/**
+ * 
+ */
 package com.resourcing.service.model;
 
 import java.util.List;
-
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,68 +17,66 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
-
 @Entity
-@Table(name = "account")
-public class Account {
-
+@Table(name = "location")
+public class Location {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "account_id")
+	@Column(name = "location_id")
 	private int id;
 	
-	@Column(name = "account_name", nullable = false)
-	private String accountName;
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
-	@JsonIgnore
-	private List <SubUnit> subUnit;
+	@Column(name = "location_name", nullable = false)
+	private String locationName;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "location")
+	@JsonIgnore
+	private List <WorkLocation> workLocation;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "location")
 	@JsonIgnore
 	private List <RateCard> rateCard;
 
 	/**
-	 * @return the accountId
+	 * @return the id
 	 */
 	public int getId() {
 		return id;
 	}
 
 	/**
-	 * @param accountId the accountId to set
+	 * @param id the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
 	/**
-	 * @return the accountName
+	 * @return the locationName
 	 */
-	public String getAccountName() {
-		return accountName;
+	public String getLocationName() {
+		return locationName;
 	}
 
 	/**
-	 * @param accountName the accountName to set
+	 * @param locationName the locationName to set
 	 */
-	public void setAccountName(String accountName) {
-		this.accountName = accountName;
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
 	}
 
 	/**
-	 * @return the subUnit
+	 * @return the workLocation
 	 */
-	public List<SubUnit> getSubUnit() {
-		return subUnit;
+	public List<WorkLocation> getWorkLocation() {
+		return workLocation;
 	}
 
 	/**
-	 * @param subUnit the subUnit to set
+	 * @param workLocation the workLocation to set
 	 */
-	public void setSubUnit(List<SubUnit> subUnit) {
-		this.subUnit = subUnit;
+	public void setWorkLocation(List<WorkLocation> workLocation) {
+		this.workLocation = workLocation;
 	}
 
 	/**
@@ -92,9 +92,6 @@ public class Account {
 	public void setRateCard(List<RateCard> rateCard) {
 		this.rateCard = rateCard;
 	}
-	
-	
-	
 	
 	
 }
