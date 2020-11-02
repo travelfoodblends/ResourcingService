@@ -214,6 +214,7 @@ public class ResourcingServiceController {
 	    throws ResourceNotFoundException {
  		SubUnit subUnitRequest = new SubUnit();
  		subUnitRequest.setId(subUnitDto.getId());
+ 		subUnitRequest.setSubunitName(subUnitDto.getSubunitName());
 	        if (!accountRepository.existsById(accountId)) {
 	            throw new ResourceNotFoundException("accountId not found");
 	        }
