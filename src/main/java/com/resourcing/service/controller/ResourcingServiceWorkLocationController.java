@@ -80,6 +80,9 @@ public class ResourcingServiceWorkLocationController {
 	    throws ResourceNotFoundException {
  		WorkLocation workLocationRequest = new WorkLocation();
  		workLocationRequest.setId(workLocationDto.getId());
+ 		workLocationRequest.setWorklocationCity(workLocationDto.getWorklocationCity());
+ 		workLocationRequest.setWorklocationState(workLocationDto.getWorklocationState());
+ 		workLocationRequest.setWorklocationCountry(workLocationDto.getWorklocationCountry());
 	        if (!locationRepository.existsById(locationId)) {
 	            throw new ResourceNotFoundException("locationId not found");
 	        }
