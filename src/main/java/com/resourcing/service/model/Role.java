@@ -1,11 +1,17 @@
 package com.resourcing.service.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -18,16 +24,17 @@ public class Role {
 	/** The id. */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "role_id")
 	private int id;
 	
 	/** The name. */
-	@Column(name = "name", nullable = false)
+	@Column(name = "role_name", nullable = false)
 	private String name;
 	
 	/** The enabled. */
-	@Column(name = "enabled")
+	@Column(name = "role_enabled")
 	private boolean enabled = true;
-	
+
 	
 	/**
 	 * Gets the id.
@@ -86,7 +93,8 @@ public class Role {
 		this.enabled = enabled;
 	}
 	
-	
+
+
 	/**
 	 * To string.
 	 *
