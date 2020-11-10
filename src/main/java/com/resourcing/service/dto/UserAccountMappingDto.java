@@ -2,9 +2,30 @@ package com.resourcing.service.dto;
 
 
 /**
- * The Class UserRoleMappingInfo.
+ * The Class UserAccountMappingDto.
  */
 public class UserAccountMappingDto {
+
+	/** The user account mapping id. */
+	private Integer userAccountMappingId;
+	
+	/**
+	 * Gets the user account mapping id.
+	 *
+	 * @return the user account mapping id
+	 */
+	public Integer getUserAccountMappingId() {
+		return userAccountMappingId;
+	}
+
+	/**
+	 * Sets the user account mapping id.
+	 *
+	 * @param userAccountMappingId the new user account mapping id
+	 */
+	public void setUserAccountMappingId(Integer userAccountMappingId) {
+		this.userAccountMappingId = userAccountMappingId;
+	}
 
 	/** The user id. */
 	private Integer userId;
@@ -12,10 +33,10 @@ public class UserAccountMappingDto {
 	/** The user name. */
 	private String userName;
 	
-	/** The role id. */
+	/** The account id. */
 	private Integer accountId;
 	
-	/** The role name. */
+	/** The account name. */
 	private String accountName;
 	
 
@@ -56,28 +77,36 @@ public class UserAccountMappingDto {
 	}
 
 	/**
-	 * @return the accountId
+	 * Gets the account id.
+	 *
+	 * @return the account id
 	 */
 	public Integer getAccountId() {
 		return accountId;
 	}
 
 	/**
-	 * @param accountId the accountId to set
+	 * Sets the account id.
+	 *
+	 * @param accountId the new account id
 	 */
 	public void setAccountId(Integer accountId) {
 		this.accountId = accountId;
 	}
 
 	/**
-	 * @return the accountName
+	 * Gets the account name.
+	 *
+	 * @return the account name
 	 */
 	public String getAccountName() {
 		return accountName;
 	}
 
 	/**
-	 * @param accountName the accountName to set
+	 * Sets the account name.
+	 *
+	 * @param accountName the new account name
 	 */
 	public void setAccountName(String accountName) {
 		this.accountName = accountName;

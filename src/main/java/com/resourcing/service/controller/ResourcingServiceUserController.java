@@ -268,4 +268,75 @@ public class ResourcingServiceUserController {
 		
 		return userAccountInfoList;
 	}
+	
+	
+	@GetMapping("/user/getAllUserAccountMappings")
+	public List <UserAccountMappingDto> getAllUserAccountMappings() {
+		List <UserAccountMapping> userAccountMappingList =  userAccountMappingRepository.findAll();
+		List<UserAccountMappingDto> userAccountInfoList = new ArrayList<>();
+		for(UserAccountMapping userAccountMapping : userAccountMappingList) {
+			UserAccountMappingDto userAccountMappingDto = new UserAccountMappingDto();
+			userAccountMappingDto.setUserAccountMappingId(userAccountMapping.getId());
+			Account account = null;
+			try {
+				Optional<Account> accountOptional = accountRepository.findById(userAccountMapping.getAccountId());
+				account = accountOptional.get();
+			}catch(NoSuchElementException ex) {
+				throw new NoSuchElementException("account not found");
+			}
+			userAccountMappingDto.setAccountId(account.getId());
+			userAccountMappingDto.setAccountName(account.getAccountName());
+			
+			User user = null;
+			try {
+				Optional<User> userOptional = userRepository.findById(userAccountMapping.getUserId());
+				user = userOptional.get();
+			}catch(NoSuchElementException ex) {
+				throw new NoSuchElementException("user not found");
+			}
+			
+			userAccountMappingDto.setUserId(user.getId());
+			userAccountMappingDto.setUserName(user.getUserName());
+			
+			userAccountInfoList.add(userAccountMappingDto);
+		}
+		
+		return userAccountInfoList;
+	}
+	
+	@GetMapping("/user/getAllUserRoleMappings")
+	public List <UserRoleMappingInfo> getAllUserRoleMappings() {
+		List <UserRoleMapping> userRoleMappingList =  userRoleMappingRepository.findAll();
+		List<UserRoleMappingInfo> userRoleInfoList = new ArrayList<>();
+		for(UserRoleMapping userRoleMapping : userRoleMappingList) {
+			UserRoleMappingInfo userRoleMappingInfo = new UserRoleMappingInfo();
+			userRoleMappingInfo.setUserRoleMappingId(userRoleMapping.getId());
+			Role role = null;
+			try {
+				Optional<Role> roleOptional = roleRepository.findById(userRoleMapping.getRoleId());
+				role = roleOptional.get();
+			}catch(NoSuchElementException ex) {
+				throw new NoSuchElementException("role not found");
+			}
+			userRoleMappingInfo.setRoleId(role.getId());
+			userRoleMappingInfo.setRoleName(role.getName());
+			userRoleMappingInfo.setRoleEnabled(role.isEnabled());
+			
+			User user = null;
+			try {
+				Optional<User> userOptional = userRepository.findById(userRoleMapping.getUserId());
+				user = userOptional.get();
+			}catch(NoSuchElementException ex) {
+				throw new NoSuchElementException("user not found");
+			}
+			
+			userRoleMappingInfo.setUserId(user.getId());
+			userRoleMappingInfo.setUserName(user.getUserName());
+			
+			userRoleInfoList.add(userRoleMappingInfo);
+		}
+		
+		return userRoleInfoList;
+	}
+	
 }

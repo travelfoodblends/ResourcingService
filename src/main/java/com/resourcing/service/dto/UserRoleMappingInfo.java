@@ -5,6 +5,9 @@ package com.resourcing.service.dto;
  * The Class UserRoleMappingInfo.
  */
 public class UserRoleMappingInfo {
+	
+	/** The user role mapping id. */
+	private Integer userRoleMappingId;
 
 	/** The user id. */
 	private Integer userId;
@@ -110,6 +113,24 @@ public class UserRoleMappingInfo {
 	public void setRoleEnabled(boolean roleEnabled) {
 		this.roleEnabled = roleEnabled;
 	}
-	
+
+	/**
+	 * Gets the user role mapping id.
+	 *
+	 * @return the user role mapping id
+	 */
+	public Integer getUserRoleMappingId() {
+		return userRoleMappingId;
+	}
+
+	/**
+	 * Sets the user role mapping id.
+	 *
+	 * @param userRoleMappingId the new user role mapping id
+	 */
+	public void setUserRoleMappingId(Integer userRoleMappingId) {
+		this.userRoleMappingId = userRoleMappingId;
+	}
+
 	
 }
