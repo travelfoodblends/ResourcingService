@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,7 @@ import com.resourcing.service.repository.RoleRepository;
 import com.resourcing.service.repository.UserAccountMappingRepository;
 import com.resourcing.service.repository.UserRepository;
 import com.resourcing.service.repository.UserRoleMappingRepository;
+
 
 /**
  * The Class ResourcingServiceUserController.
@@ -140,26 +142,40 @@ public class ResourcingServiceUserController {
 	 * Creates the user role mapping.
 	 *
 	 * @param userRoleAccountMappingDto the user role account mapping dto
-	 * @return the user role mapping
+	 * @return the user role mapping info
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@PostMapping("/user/roleMapping")
-    public UserRoleMapping createUserRoleMapping(@Valid @RequestBody UserRoleAccountMappingDto userRoleAccountMappingDto) throws ResourceNotFoundException {
-		UserRoleMapping userRoleMapping = new UserRoleMapping();
+    public UserRoleMappingInfo createUserRoleMapping(@Valid @RequestBody UserRoleAccountMappingDto userRoleAccountMappingDto) throws ResourceNotFoundException {
+		UserRoleMapping userRoleMappingReq = new UserRoleMapping();
+		UserRoleMapping userRoleMappingRes = new UserRoleMapping();
+		UserRoleMappingInfo userRoleMappingInfo = new UserRoleMappingInfo();
 		Role role = null;
+		User user = null;
 		try {
 			Optional<Role> roleOptional = roleRepository.findById(userRoleAccountMappingDto.getRoleId());
 			role = roleOptional.get();
-			userRoleMapping.setRoleId(role != null ? role.getId() : null);
+			userRoleMappingReq.setRoleId(role != null ? role.getId() : null);
 		}catch(NoSuchElementException ex) {
 			throw new NoSuchElementException("role not found");
 		}
-		
-        return userRepository.findById(userRoleAccountMappingDto.getUserId()).map(user -> {
-        	userRoleMapping.setUserId(user != null ? user.getId() : null);
-        	return userRoleMappingRepository.save(userRoleMapping);
-        }).orElseThrow(() -> new ResourceNotFoundException("user not found"));
+
+        try {
+        	Optional<User> userOptional = userRepository.findById(userRoleAccountMappingDto.getUserId());
+        	user = userOptional.get();
+        	userRoleMappingReq.setUserId(user != null ? user.getId() : null);
+        }catch(NoSuchElementException ex) {
+        	throw new NoSuchElementException("user not found");
+        }
         
+        userRoleMappingRes = userRoleMappingRepository.save(userRoleMappingReq);
+        userRoleMappingInfo.setUserRoleMappingId(userRoleMappingRes.getId());
+        userRoleMappingInfo.setUserId(user.getId());
+        userRoleMappingInfo.setUserName(user.getUserName());
+        userRoleMappingInfo.setRoleId(role.getId());
+        userRoleMappingInfo.setRoleName(role.getName());
+        userRoleMappingInfo.setRoleEnabled(role.isEnabled());
+        return userRoleMappingInfo;
     }
 	
 	/**
@@ -208,13 +224,15 @@ public class ResourcingServiceUserController {
 	 * Creates the user account mapping.
 	 *
 	 * @param userRoleAccountMappingDto the user role account mapping dto
-	 * @return the user account mapping
+	 * @return the user account mapping dto
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@PostMapping("/user/accountMapping")
-    public UserAccountMapping createUserAccountMapping(@Valid @RequestBody UserRoleAccountMappingDto userRoleAccountMappingDto) throws ResourceNotFoundException {
+    public UserAccountMappingDto createUserAccountMapping(@Valid @RequestBody UserRoleAccountMappingDto userRoleAccountMappingDto) throws ResourceNotFoundException {
 		UserAccountMapping userAccountMapping = new UserAccountMapping();
+		UserAccountMappingDto userAccountMappingDto = new UserAccountMappingDto();
 		Account account = null;
+		User user = null;
 		try {
 			Optional<Account> accountOptional = accountRepository.findById(userRoleAccountMappingDto.getAccountId());
 			account = accountOptional.get();
@@ -223,11 +241,23 @@ public class ResourcingServiceUserController {
 			throw new NoSuchElementException("account not found");
 		}
 		
-        return userRepository.findById(userRoleAccountMappingDto.getUserId()).map(user -> {
+        try {
+        	Optional<User> userOptional = userRepository.findById(userRoleAccountMappingDto.getUserId());
+        	user = userOptional.get();
         	userAccountMapping.setUserId(user != null ? user.getId() : null);
-        	return userAccountMappingRepository.save(userAccountMapping);
-        }).orElseThrow(() -> new ResourceNotFoundException("user not found"));
+        }catch(NoSuchElementException ex) {
+        	throw new NoSuchElementException("user not found");
+        }
         
+        userAccountMapping = userAccountMappingRepository.save(userAccountMapping);
+        userAccountMappingDto.setUserAccountMappingId(userAccountMapping.getId());
+        userAccountMappingDto.setUserId(user.getId());
+        userAccountMappingDto.setUserName(user.getUserName());
+        userAccountMappingDto.setAccountId(account.getId());
+        userAccountMappingDto.setAccountName(account.getAccountName());
+        
+        return userAccountMappingDto;
+        	
     }
 	
 	/**
@@ -270,6 +300,11 @@ public class ResourcingServiceUserController {
 	}
 	
 	
+	/**
+	 * Gets the all user account mappings.
+	 *
+	 * @return the all user account mappings
+	 */
 	@GetMapping("/user/getAllUserAccountMappings")
 	public List <UserAccountMappingDto> getAllUserAccountMappings() {
 		List <UserAccountMapping> userAccountMappingList =  userAccountMappingRepository.findAll();
@@ -304,6 +339,11 @@ public class ResourcingServiceUserController {
 		return userAccountInfoList;
 	}
 	
+	/**
+	 * Gets the all user role mappings.
+	 *
+	 * @return the all user role mappings
+	 */
 	@GetMapping("/user/getAllUserRoleMappings")
 	public List <UserRoleMappingInfo> getAllUserRoleMappings() {
 		List <UserRoleMapping> userRoleMappingList =  userRoleMappingRepository.findAll();
@@ -337,6 +377,42 @@ public class ResourcingServiceUserController {
 		}
 		
 		return userRoleInfoList;
+	}
+	
+	/**
+	 * Delete user account mapping.
+	 *
+	 * @param userAccountMappingId the user account mapping id
+	 * @return the response entity
+	 * @throws ResourceNotFoundException the resource not found exception
+	 */
+	@SuppressWarnings("rawtypes")
+	@DeleteMapping("/user/deleteUserAccountMapping/{userAccountMappingId}")
+	public ResponseEntity deleteUserAccountMapping(@PathVariable(value = "userAccountMappingId") Integer userAccountMappingId) 
+			throws ResourceNotFoundException {
+	        return userAccountMappingRepository.findById(userAccountMappingId).map(userAccountMapping -> {
+	        	userAccountMappingRepository.delete(userAccountMapping);
+	            return ResponseEntity.ok().build();
+	        }).orElseThrow(() -> new ResourceNotFoundException(
+	            "User-Account mapping not found with id " + userAccountMappingId));
+	}
+	
+	/**
+	 * Delete user role mapping.
+	 *
+	 * @param userRoleMappingId the user role mapping id
+	 * @return the response entity
+	 * @throws ResourceNotFoundException the resource not found exception
+	 */
+	@SuppressWarnings("rawtypes")
+	@DeleteMapping("/user/deleteUserRoleMapping/{userRoleMappingId}")
+	public ResponseEntity deleteUserRoleMapping(@PathVariable(value = "userRoleMappingId") Integer userRoleMappingId) 
+			throws ResourceNotFoundException {
+	        return userRoleMappingRepository.findById(userRoleMappingId).map(userRoleMapping -> {
+	        	userRoleMappingRepository.delete(userRoleMapping);
+	            return ResponseEntity.ok().build();
+	        }).orElseThrow(() -> new ResourceNotFoundException(
+	            "User-Role mapping not found with id " + userRoleMappingId));
 	}
 	
 }
